@@ -1,0 +1,27 @@
+# Environnements Python
+.venv/
+.venv*/
+env/
+venv/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Données brutes (mais on garde le propre)
+data/brut/*.csv
+
+# Logs
+*.log
