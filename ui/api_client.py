@@ -1,19 +1,29 @@
 import requests
+import streamlit as st
 from datetime import date
 
 API_URL = "http://127.0.0.1:8000"
 
+
+def _headers():
+    token = st.session_state.get("token")
+    if token:
+        return {"Authorization": f"Bearer {token}"}
+    return {}
+
+
 def _get(path, params=None):
     try:
-        r = requests.get(f"{API_URL}{path}", params=params, timeout=5)
+        r = requests.get(f"{API_URL}{path}", params=params, headers=_headers(), timeout=5)
         r.raise_for_status()
         return r.json()
     except requests.exceptions.RequestException as e:
         return {"_erreur": str(e)}
 
+
 def _post(path, json=None):
     try:
-        r = requests.post(f"{API_URL}{path}", json=json, timeout=5)
+        r = requests.post(f"{API_URL}{path}", json=json, headers=_headers(), timeout=5)
         r.raise_for_status()
         return r.json()
     except requests.exceptions.HTTPError as e:
@@ -25,7 +35,24 @@ def _post(path, json=None):
         return {"_erreur": str(e)}
 
 
-# --- API publique ---
+def login(username, password):
+    try:
+        r = requests.post(
+            f"{API_URL}/auth/token",
+            data={"username": username, "password": password},
+            timeout=5,
+        )
+        if r.status_code == 200:
+            return r.json()
+        return {"_erreur": r.json().get("detail", "Erreur inconnue")}
+    except requests.exceptions.RequestException as e:
+        return {"_erreur": str(e)}
+
+
+def get_me():
+    return _get("/auth/me")
+
+
 def get_kpis():
     return _get("/analytics/kpis")
 
@@ -44,10 +71,6 @@ def get_specialites():
 def get_patients():
     return _get("/referentiels/patients")
 
-def get_medecins():
-    # À ajouter côté API plus tard. En attendant, on simule.
-    return []
-
 def get_rdv(date_debut=None, date_fin=None, medecin_id=None, statut=None):
     params = {}
     if date_debut: params["date_debut"] = str(date_debut)
@@ -63,7 +86,9 @@ def annuler_rdv(rdv_id, motif):
     try:
         r = requests.patch(
             f"{API_URL}/rendez_vous/{rdv_id}/annuler",
-            json={"motif_annulation": motif}, timeout=5
+            json={"motif_annulation": motif},
+            headers=_headers(),
+            timeout=5,
         )
         r.raise_for_status()
         return r.json()
