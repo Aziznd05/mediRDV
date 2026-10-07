@@ -91,3 +91,25 @@ class RendezVous(Base):
     patient = relationship("Patient", back_populates="rendez_vous")
     medecin = relationship("Medecin", back_populates="rendez_vous")
     specialite = relationship("Specialite")
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    email = Column(String(120), unique=True, nullable=False)
+    hashed_password = Column(String(200), nullable=False)
+    role = Column(String(30), nullable=False)  # agent, medecin, responsable, direction, admin
+    actif = Column(Boolean, default=True)
+    medecin_id = Column(Integer, ForeignKey("medecins.id"), nullable=True)  # si rôle = medecin
+    date_creation = Column(DateTime, default=datetime.utcnow)
+
+
+class ActionLog(Base):
+    __tablename__ = "action_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    action = Column(String(50), nullable=False)  # creation, modification, annulation
+    entite = Column(String(50), nullable=False)  # rendez_vous, patient, medecin
+    entite_id = Column(Integer, nullable=True)
+    details = Column(Text, nullable=True)
+    date_action = Column(DateTime, default=datetime.utcnow)

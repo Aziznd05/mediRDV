@@ -77,3 +77,31 @@ class CreneauLibre(BaseModel):
     date_rdv: date
     heure_debut: time
     duree_minutes: int
+
+class UserBase(BaseModel):
+    username: str
+    email: str
+    role: str
+    medecin_id: Optional[int] = None
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class UserOut(UserBase):
+    id: int
+    actif: bool
+    model_config = ConfigDict(from_attributes=True)
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    role: str
+    username: str
+
+
+class LoginInput(BaseModel):
+    username: str
+    password: str
