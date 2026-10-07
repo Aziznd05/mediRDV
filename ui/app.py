@@ -8,7 +8,7 @@ if str(RACINE) not in sys.path:
 
 import streamlit as st
 from ui.theme import injecter_css, COULEURS
-from ui.pages import dashboard, planning, prise_rdv, patients
+from ui.views import dashboard, planning, prise_rdv, patients
 
 st.set_page_config(
     page_title="MédiRDV — Clinique Les Baobabs",

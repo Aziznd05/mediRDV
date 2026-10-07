@@ -23,6 +23,7 @@ def afficher():
                 )
                 df = df[mask]
             st.markdown(f"**{len(df)} patients**")
+            df["telephone"] = df["telephone"].astype(str).str.replace(r"\.0$", "", regex=True)
             st.dataframe(df, use_container_width=True, hide_index=True)
 
     with tab2:

@@ -12,7 +12,7 @@ def afficher():
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        medecin_id = st.number_input("ID Médecin", min_value=1, value=1, step=1)
+        medecin_id = st.number_input("ID Médecin", min_value=1, value=1, step=1, help=None)
     with col2:
         date_debut = st.date_input("À partir du", value=date.today())
     with col3:
