@@ -56,3 +56,24 @@ class RendezVousOut(RendezVousBase):
     confirme: bool
     date_creation: datetime
     model_config = ConfigDict(from_attributes=True)
+
+class RendezVousDetail(RendezVousOut):
+    patient_nom: Optional[str] = None
+    patient_prenom: Optional[str] = None
+    medecin_nom: Optional[str] = None
+    specialite_nom: Optional[str] = None
+
+
+class AnnulationInput(BaseModel):
+    motif_annulation: str  # Patient, Médecin, Clinique, Autre
+
+
+class StatutInput(BaseModel):
+    statut: str  # Honoré ou Absent
+
+
+class CreneauLibre(BaseModel):
+    medecin_id: int
+    date_rdv: date
+    heure_debut: time
+    duree_minutes: int

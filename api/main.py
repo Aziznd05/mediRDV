@@ -30,6 +30,7 @@ from api.config import settings
 from api.database import Base, engine
 from api import models  # noqa
 from api.routes import referentiels
+from api.routes import referentiels, rendez_vous
 
 Base.metadata.create_all(bind=engine)
 
@@ -40,7 +41,7 @@ app = FastAPI(
 )
 
 app.include_router(referentiels.router)
-
+app.include_router(rendez_vous.router)
 
 @app.get("/", tags=["Racine"])
 def racine():
@@ -50,3 +51,5 @@ def racine():
 @app.get("/health", tags=["Racine"])
 def health():
     return {"status": "healthy"}
+
+from api.routes import referentiels, rendez_vous
