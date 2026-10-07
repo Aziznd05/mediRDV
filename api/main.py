@@ -1,3 +1,4 @@
+from api.routes import referentiels, rendez_vous, analytics
 from fastapi import FastAPI
 from api.config import settings
 from api.database import Base, engine
@@ -31,6 +32,8 @@ from api.database import Base, engine
 from api import models  # noqa
 from api.routes import referentiels
 from api.routes import referentiels, rendez_vous
+from api.routes import referentiels, rendez_vous, analytics
+app.include_router(analytics.router)
 
 Base.metadata.create_all(bind=engine)
 
@@ -42,6 +45,7 @@ app = FastAPI(
 
 app.include_router(referentiels.router)
 app.include_router(rendez_vous.router)
+app.include_router(analytics.router)
 
 @app.get("/", tags=["Racine"])
 def racine():
