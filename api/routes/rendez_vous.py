@@ -1,17 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from datetime import date, time, datetime, timedelta, time as time_type
+from datetime import date, time, datetime, timedelta
 from typing import List, Optional
 
 from api.database import get_db
 from api import models, schemas
+from api.auth import get_current_user, require_role, log_action
 
 router = APIRouter(prefix="/rendez_vous", tags=["Rendez-vous"])
+
+ROLES_RDV = ("admin", "responsable", "agent")
+ROLES_STATUT = ("admin", "responsable", "medecin")
 
 
 # --- Helpers ---
 def creneau_chevauche(h1: time, d1: int, h2: time, d2: int) -> bool:
-    """Deux créneaux se chevauchent-ils ?"""
     debut1 = datetime.combine(date.today(), h1)
     fin1 = debut1 + timedelta(minutes=d1)
     debut2 = datetime.combine(date.today(), h2)
@@ -20,8 +23,7 @@ def creneau_chevauche(h1: time, d1: int, h2: time, d2: int) -> bool:
 
 
 def est_dans_plage(db: Session, medecin_id: int, date_rdv: date, heure: time) -> bool:
-    """RG-03 : le RDV doit être dans une plage ouverte du médecin."""
-    jour_semaine = date_rdv.weekday()  # 0 = lundi
+    jour_semaine = date_rdv.weekday()
     plages = db.query(models.PlageHoraire).filter_by(
         medecin_id=medecin_id, jour_semaine=jour_semaine
     ).all()
@@ -31,38 +33,34 @@ def est_dans_plage(db: Session, medecin_id: int, date_rdv: date, heure: time) ->
     return False
 
 
-# --- Recherche du premier créneau libre (EF-11) ---
+# --- EF-11 : recherche de créneaux libres ---
 @router.get("/creneaux-libres", response_model=List[schemas.CreneauLibre])
 def chercher_creneaux_libres(
     medecin_id: int,
-    date_debut: date = Query(..., description="Date de début de recherche"),
+    date_debut: date = Query(...),
     nb_jours: int = Query(7, ge=1, le=30),
     db: Session = Depends(get_db),
+    _user: models.User = Depends(get_current_user),
 ):
-    """Cherche les premiers créneaux libres d'un médecin sur N jours."""
     resultats = []
     for offset in range(nb_jours):
         jour = date_debut + timedelta(days=offset)
-        jour_semaine = jour.weekday()
         plages = db.query(models.PlageHoraire).filter_by(
-            medecin_id=medecin_id, jour_semaine=jour_semaine
+            medecin_id=medecin_id, jour_semaine=jour.weekday()
         ).all()
         if not plages:
             continue
 
-        # Récupère les RDV existants ce jour-là
         rdv_jour = db.query(models.RendezVous).filter_by(
             medecin_id=medecin_id, date_rdv=jour
         ).filter(models.RendezVous.statut.in_(["Planifié", "Confirmé", "Honoré"])).all()
 
         for plage in plages:
-            # Génère des créneaux de 20 min par défaut
             pas = 20
             courant = datetime.combine(jour, plage.heure_debut)
             fin_plage = datetime.combine(jour, plage.heure_fin)
             while courant + timedelta(minutes=pas) <= fin_plage:
                 heure = courant.time()
-                # Vérifie si libre
                 libre = True
                 for rdv in rdv_jour:
                     if creneau_chevauche(heure, pas, rdv.heure_debut, rdv.duree_minutes):
@@ -77,21 +75,22 @@ def chercher_creneaux_libres(
                     ))
                 courant += timedelta(minutes=pas)
 
-    # Limite à 10 résultats
     return resultats[:10]
 
 
-# --- Création d'un RDV avec toutes les règles ---
+# --- Création avec RG-01 à RG-04 ---
 @router.post("", response_model=schemas.RendezVousOut, status_code=201)
-def creer_rdv(data: schemas.RendezVousCreate, db: Session = Depends(get_db)):
-    # RG-04 : pas dans le passé, pas > 90 jours
+def creer_rdv(
+    data: schemas.RendezVousCreate,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(require_role(*ROLES_RDV)),
+):
     aujourdhui = date.today()
     if data.date_rdv < aujourdhui:
         raise HTTPException(400, "RG-04 : impossible de créer un RDV dans le passé")
     if data.date_rdv > aujourdhui + timedelta(days=90):
         raise HTTPException(400, "RG-04 : impossible de créer un RDV à plus de 90 jours")
 
-    # Vérifie que le patient et le médecin existent
     if not db.query(models.Patient).get(data.patient_id):
         raise HTTPException(404, "Patient introuvable")
     if not db.query(models.Medecin).get(data.medecin_id):
@@ -99,11 +98,9 @@ def creer_rdv(data: schemas.RendezVousCreate, db: Session = Depends(get_db)):
     if not db.query(models.Specialite).get(data.specialite_id):
         raise HTTPException(404, "Spécialité introuvable")
 
-    # RG-03 : le créneau doit être dans une plage ouverte
     if not est_dans_plage(db, data.medecin_id, data.date_rdv, data.heure_debut):
         raise HTTPException(400, "RG-03 : le médecin ne consulte pas à ce créneau")
 
-    # RG-01 : un créneau médecin = un seul RDV actif
     rdv_medecin = db.query(models.RendezVous).filter_by(
         medecin_id=data.medecin_id, date_rdv=data.date_rdv
     ).filter(models.RendezVous.statut.in_(["Planifié", "Confirmé", "Honoré"])).all()
@@ -111,7 +108,6 @@ def creer_rdv(data: schemas.RendezVousCreate, db: Session = Depends(get_db)):
         if creneau_chevauche(data.heure_debut, data.duree_minutes, rdv.heure_debut, rdv.duree_minutes):
             raise HTTPException(409, f"RG-01 : le médecin a déjà un RDV sur ce créneau (RDV id={rdv.id})")
 
-    # RG-02 : un patient ne peut pas avoir deux RDV qui se chevauchent
     rdv_patient = db.query(models.RendezVous).filter_by(
         patient_id=data.patient_id, date_rdv=data.date_rdv
     ).filter(models.RendezVous.statut.in_(["Planifié", "Confirmé", "Honoré"])).all()
@@ -119,25 +115,26 @@ def creer_rdv(data: schemas.RendezVousCreate, db: Session = Depends(get_db)):
         if creneau_chevauche(data.heure_debut, data.duree_minutes, rdv.heure_debut, rdv.duree_minutes):
             raise HTTPException(409, f"RG-02 : le patient a déjà un RDV sur ce créneau (RDV id={rdv.id})")
 
-    # Création
-    rdv = models.RendezVous(
-        **data.model_dump(),
-        statut="Planifié",
-        confirme=False,
-    )
+    rdv = models.RendezVous(**data.model_dump(), statut="Planifié", confirme=False)
     db.add(rdv)
     db.commit()
     db.refresh(rdv)
+    log_action(db, user, "creation", "rendez_vous", rdv.id,
+               f"patient={rdv.patient_id} medecin={rdv.medecin_id} date={rdv.date_rdv}")
     return rdv
 
 
-# --- Annulation (RG-05) ---
+# --- RG-05 : annulation ---
 @router.patch("/{rdv_id}/annuler", response_model=schemas.RendezVousOut)
-def annuler_rdv(rdv_id: int, data: schemas.AnnulationInput, db: Session = Depends(get_db)):
+def annuler_rdv(
+    rdv_id: int,
+    data: schemas.AnnulationInput,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(require_role(*ROLES_RDV)),
+):
     rdv = db.query(models.RendezVous).get(rdv_id)
     if not rdv:
         raise HTTPException(404, "RDV introuvable")
-
     if rdv.statut not in ("Planifié", "Confirmé"):
         raise HTTPException(400, f"Impossible d'annuler un RDV au statut {rdv.statut}")
 
@@ -149,30 +146,35 @@ def annuler_rdv(rdv_id: int, data: schemas.AnnulationInput, db: Session = Depend
     rdv.motif_annulation = data.motif_annulation
     db.commit()
     db.refresh(rdv)
-    # RG-06 : le créneau est immédiatement libre (implicite ici, car les requêtes filtrent sur statut actif)
+    log_action(db, user, "annulation", "rendez_vous", rdv.id,
+               f"motif={data.motif_annulation}")
     return rdv
 
 
-# --- Changement de statut (RG-07) ---
+# --- RG-07 : changement de statut ---
 @router.patch("/{rdv_id}/statut", response_model=schemas.RendezVousOut)
-def changer_statut(rdv_id: int, data: schemas.StatutInput, db: Session = Depends(get_db)):
+def changer_statut(
+    rdv_id: int,
+    data: schemas.StatutInput,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(require_role(*ROLES_STATUT)),
+):
     rdv = db.query(models.RendezVous).get(rdv_id)
     if not rdv:
         raise HTTPException(404, "RDV introuvable")
-
     if data.statut not in ("Honoré", "Absent"):
         raise HTTPException(400, "Le statut ne peut être que 'Honoré' ou 'Absent'")
-
     if rdv.statut not in ("Planifié", "Confirmé"):
         raise HTTPException(400, f"Impossible de changer le statut d'un RDV {rdv.statut}")
 
     rdv.statut = data.statut
     db.commit()
     db.refresh(rdv)
+    log_action(db, user, "statut", "rendez_vous", rdv.id, f"nouveau={data.statut}")
     return rdv
 
 
-# --- Liste des RDV (EF-15) ---
+# --- EF-15 : liste des RDV ---
 @router.get("", response_model=List[schemas.RendezVousOut])
 def lister_rdv(
     date_debut: Optional[date] = None,
@@ -181,6 +183,7 @@ def lister_rdv(
     specialite_id: Optional[int] = None,
     statut: Optional[str] = None,
     db: Session = Depends(get_db),
+    _user: models.User = Depends(get_current_user),
 ):
     q = db.query(models.RendezVous)
     if date_debut:
