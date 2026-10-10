@@ -11,7 +11,7 @@ from ui.views import dashboard, planning, prise_rdv, patients, login
 
 st.set_page_config(
     page_title="MédiRDV — Clinique Les Baobabs",
-    page_icon="🏥",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -25,16 +25,22 @@ if "token" not in st.session_state:
 
 # --- Sidebar ---
 with st.sidebar:
+
+      # Logo clinique
+    logo_path = Path(__file__).parent / "assets" / "logo.png"
+    col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
+    with col_l2:
+        st.image(str(logo_path), use_container_width=True)
+
     st.markdown(f"""
-    <div style="text-align:center; padding: 20px 0;">
-        <div style="font-size: 3rem;">🏥</div>
-        <h2 style="color:{COULEURS['vert_fonce']}; margin: 8px 0 4px 0;">MédiRDV</h2>
-        <p style="color:{COULEURS['gris']}; font-size: 0.85rem; margin: 0;">
+    <div style="text-align:center; margin-bottom: 20px;">
+        <h2 style="color:{COULEURS['vert_fonce']}; margin: 8px 0 4px 0; font-size: 1.4rem;">MédiRDV</h2>
+        <p style="color:{COULEURS['gris']}; font-size: 0.8rem; margin: 0;">
         Clinique Les Baobabs<br>Dakar, Sénégal
         </p>
     </div>
     """, unsafe_allow_html=True)
-
+  
     st.markdown("---")
 
     st.markdown(f"""
@@ -47,13 +53,13 @@ with st.sidebar:
 
     page = st.radio(
         "Navigation",
-        ["📊 Tableau de bord", "🗓️ Planning", "➕ Prise de RDV", "👥 Patients"],
+        [" Tableau de bord", "Planning", " Prise de RDV", "Patients"],
         label_visibility="collapsed",
     )
 
     st.markdown("---")
 
-    if st.button("🚪 Se déconnecter", use_container_width=True):
+    if st.button(" Se déconnecter", use_container_width=True):
         for k in ["token", "role", "username"]:
             st.session_state.pop(k, None)
         st.rerun()
@@ -67,11 +73,11 @@ with st.sidebar:
 
 
 # --- Routage ---
-if page == "📊 Tableau de bord":
+if page == " Tableau de bord":
     dashboard.afficher()
-elif page == "🗓️ Planning":
+elif page == " Planning":
     planning.afficher()
-elif page == "➕ Prise de RDV":
+elif page == " Prise de RDV":
     prise_rdv.afficher()
-elif page == "👥 Patients":
+elif page == " Patients":
     patients.afficher()

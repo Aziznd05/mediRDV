@@ -1,3 +1,4 @@
+from pathlib import Path
 import streamlit as st
 from ui import api_client as api
 from ui.theme import COULEURS
@@ -7,10 +8,17 @@ def afficher():
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col2:
-        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # Logo
+        logo_path = Path(__file__).parent.parent / "assets" / "logo.png"
+        if logo_path.exists():
+            col_l1, col_l2, col_l3 = st.columns([1, 1, 1])
+            with col_l2:
+                st.image(str(logo_path), use_container_width=True)
+
         st.markdown(f"""
         <div style="text-align:center; margin-bottom: 30px;">
-            <div style="font-size: 4rem;">🏥</div>
             <h1 style="color:{COULEURS['vert_fonce']}; margin: 8px 0 4px 0;">MédiRDV</h1>
             <p style="color:{COULEURS['gris']}; margin: 0;">
             Clinique Les Baobabs · Dakar, Sénégal
@@ -19,9 +27,9 @@ def afficher():
         """, unsafe_allow_html=True)
 
         with st.form("login_form"):
-            username = st.text_input("Nom d'utilisateur", placeholder="admin")
+            username = st.text_input("Nom d'utilisateur", placeholder="administrateur")
             password = st.text_input("Mot de passe", type="password", placeholder="••••••••")
-            submitted = st.form_submit_button("🔓 Se connecter", use_container_width=True, type="primary")
+            submitted = st.form_submit_button(" Se connecter", use_container_width=True, type="primary")
 
             if submitted:
                 if not username or not password:
@@ -30,7 +38,7 @@ def afficher():
                     with st.spinner("Connexion en cours..."):
                         res = api.login(username, password)
                     if "_erreur" in res:
-                        st.error(f"❌ {res['_erreur']}")
+                        st.error(f" {res['_erreur']}")
                     else:
                         st.session_state["token"] = res["access_token"]
                         st.session_state["role"] = res["role"]
