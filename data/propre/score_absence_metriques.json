@@ -1,0 +1,84 @@
+{
+  "resultats": [
+    {
+      "modele": "Régression logistique",
+      "auc": 0.962,
+      "seuil": 0.1,
+      "precision": 0.464,
+      "rappel": 1.0,
+      "matrice_confusion": [
+        [
+          257,
+          60
+        ],
+        [
+          0,
+          52
+        ]
+      ]
+    },
+    {
+      "modele": "Random Forest",
+      "auc": 0.952,
+      "seuil": 0.15,
+      "precision": 0.515,
+      "rappel": 1.0,
+      "matrice_confusion": [
+        [
+          268,
+          49
+        ],
+        [
+          0,
+          52
+        ]
+      ]
+    }
+  ],
+  "importances": [
+    {
+      "variable": "taux_absence_hist",
+      "importance": 0.6798743966705061
+    },
+    {
+      "variable": "age",
+      "importance": 0.07422368711125889
+    },
+    {
+      "variable": "delai",
+      "importance": 0.07175829351812035
+    },
+    {
+      "variable": "heure",
+      "importance": 0.04402170501246577
+    },
+    {
+      "variable": "est_confirme",
+      "importance": 0.04391461782718939
+    },
+    {
+      "variable": "jour_semaine",
+      "importance": 0.03513717859578812
+    },
+    {
+      "variable": "spe_Médecine générale",
+      "importance": 0.00720153634235878
+    },
+    {
+      "variable": "spe_Gynécologie-obstétrique",
+      "importance": 0.007096580629039922
+    },
+    {
+      "variable": "spe_Pédiatrie",
+      "importance": 0.006582048886186485
+    },
+    {
+      "variable": "spe_Cardiologie",
+      "importance": 0.0063233031268590326
+    }
+  ],
+  "hypothese_couts": {
+    "cout_appel_relance": 1,
+    "cout_creneau_perdu": 10
+  }
+}

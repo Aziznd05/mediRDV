@@ -1,0 +1,339 @@
+{
+  "resultats_modeles": [
+    {
+      "specialite": "Cardiologie",
+      "mae_naive": 1.62,
+      "mape_naive": 111.25,
+      "mae_hw": 2.34,
+      "mape_hw": 181.41,
+      "modele": "HW-saisonnier"
+    },
+    {
+      "specialite": "Dermatologie",
+      "mae_naive": 1.19,
+      "mape_naive": 63.02,
+      "mae_hw": 1.32,
+      "mape_hw": 87.64,
+      "modele": "HW-saisonnier"
+    },
+    {
+      "specialite": "Endocrinologie",
+      "mae_naive": 0.88,
+      "mape_naive": 57.03,
+      "mae_hw": 1.9,
+      "mape_hw": 152.32,
+      "modele": "HW-saisonnier"
+    },
+    {
+      "specialite": "Gynécologie-obstétrique",
+      "mae_naive": 1.5,
+      "mape_naive": 46.93,
+      "mae_hw": 2.29,
+      "mape_hw": 69.84,
+      "modele": "HW-saisonnier"
+    },
+    {
+      "specialite": "Kinésithérapie",
+      "mae_naive": 0.75,
+      "mape_naive": 59.9,
+      "mae_hw": 1.06,
+      "mape_hw": 61.46,
+      "modele": "HW-saisonnier"
+    },
+    {
+      "specialite": "Médecine générale",
+      "mae_naive": 1.75,
+      "mape_naive": 24.37,
+      "mae_hw": 2.12,
+      "mape_hw": 32.25,
+      "modele": "HW-saisonnier"
+    },
+    {
+      "specialite": "ORL",
+      "mae_naive": 1.25,
+      "mape_naive": 61.98,
+      "mae_hw": 0.85,
+      "mape_hw": 61.04,
+      "modele": "HW-saisonnier"
+    },
+    {
+      "specialite": "Ophtalmologie",
+      "mae_naive": 1.0,
+      "mape_naive": 60.0,
+      "mae_hw": 1.39,
+      "mape_hw": 89.21,
+      "modele": "HW-saisonnier"
+    },
+    {
+      "specialite": "Pédiatrie",
+      "mae_naive": 1.75,
+      "mape_naive": 34.84,
+      "mae_hw": 1.6,
+      "mape_hw": 30.05,
+      "modele": "HW-saisonnier"
+    }
+  ],
+  "previsions_4_semaines": {
+    "Cardiologie": {
+      "modele": "HW-saisonnier",
+      "points": [
+        {
+          "semaine": "2027-01-04",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 6
+        },
+        {
+          "semaine": "2027-01-11",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 5
+        },
+        {
+          "semaine": "2027-01-18",
+          "prevision": 3,
+          "borne_basse": 0,
+          "borne_haute": 7
+        },
+        {
+          "semaine": "2027-01-25",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 6
+        }
+      ]
+    },
+    "Dermatologie": {
+      "modele": "HW-saisonnier",
+      "points": [
+        {
+          "semaine": "2027-01-04",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 5
+        },
+        {
+          "semaine": "2027-01-11",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 5
+        },
+        {
+          "semaine": "2027-01-18",
+          "prevision": 3,
+          "borne_basse": 1,
+          "borne_haute": 6
+        },
+        {
+          "semaine": "2027-01-25",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 5
+        }
+      ]
+    },
+    "Endocrinologie": {
+      "modele": "HW-saisonnier",
+      "points": [
+        {
+          "semaine": "2027-01-04",
+          "prevision": 3,
+          "borne_basse": 0,
+          "borne_haute": 7
+        },
+        {
+          "semaine": "2027-01-11",
+          "prevision": 1,
+          "borne_basse": 0,
+          "borne_haute": 5
+        },
+        {
+          "semaine": "2027-01-18",
+          "prevision": 1,
+          "borne_basse": 0,
+          "borne_haute": 5
+        },
+        {
+          "semaine": "2027-01-25",
+          "prevision": 1,
+          "borne_basse": 0,
+          "borne_haute": 5
+        }
+      ]
+    },
+    "Gynécologie-obstétrique": {
+      "modele": "HW-saisonnier",
+      "points": [
+        {
+          "semaine": "2027-01-04",
+          "prevision": 6,
+          "borne_basse": 2,
+          "borne_haute": 9
+        },
+        {
+          "semaine": "2027-01-11",
+          "prevision": 6,
+          "borne_basse": 2,
+          "borne_haute": 10
+        },
+        {
+          "semaine": "2027-01-18",
+          "prevision": 5,
+          "borne_basse": 1,
+          "borne_haute": 8
+        },
+        {
+          "semaine": "2027-01-25",
+          "prevision": 4,
+          "borne_basse": 0,
+          "borne_haute": 8
+        }
+      ]
+    },
+    "Kinésithérapie": {
+      "modele": "HW-saisonnier",
+      "points": [
+        {
+          "semaine": "2027-01-04",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 4
+        },
+        {
+          "semaine": "2027-01-11",
+          "prevision": 1,
+          "borne_basse": 0,
+          "borne_haute": 3
+        },
+        {
+          "semaine": "2027-01-18",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 4
+        },
+        {
+          "semaine": "2027-01-25",
+          "prevision": 1,
+          "borne_basse": 0,
+          "borne_haute": 3
+        }
+      ]
+    },
+    "Médecine générale": {
+      "modele": "HW-saisonnier",
+      "points": [
+        {
+          "semaine": "2027-01-04",
+          "prevision": 7,
+          "borne_basse": 3,
+          "borne_haute": 12
+        },
+        {
+          "semaine": "2027-01-11",
+          "prevision": 8,
+          "borne_basse": 3,
+          "borne_haute": 13
+        },
+        {
+          "semaine": "2027-01-18",
+          "prevision": 8,
+          "borne_basse": 3,
+          "borne_haute": 13
+        },
+        {
+          "semaine": "2027-01-25",
+          "prevision": 7,
+          "borne_basse": 2,
+          "borne_haute": 12
+        }
+      ]
+    },
+    "ORL": {
+      "modele": "HW-saisonnier",
+      "points": [
+        {
+          "semaine": "2027-01-04",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 5
+        },
+        {
+          "semaine": "2027-01-11",
+          "prevision": 1,
+          "borne_basse": 0,
+          "borne_haute": 4
+        },
+        {
+          "semaine": "2027-01-18",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 4
+        },
+        {
+          "semaine": "2027-01-25",
+          "prevision": 1,
+          "borne_basse": 0,
+          "borne_haute": 4
+        }
+      ]
+    },
+    "Ophtalmologie": {
+      "modele": "HW-saisonnier",
+      "points": [
+        {
+          "semaine": "2027-01-04",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 5
+        },
+        {
+          "semaine": "2027-01-11",
+          "prevision": 1,
+          "borne_basse": 0,
+          "borne_haute": 4
+        },
+        {
+          "semaine": "2027-01-18",
+          "prevision": 2,
+          "borne_basse": 0,
+          "borne_haute": 5
+        },
+        {
+          "semaine": "2027-01-25",
+          "prevision": 3,
+          "borne_basse": 0,
+          "borne_haute": 5
+        }
+      ]
+    },
+    "Pédiatrie": {
+      "modele": "HW-saisonnier",
+      "points": [
+        {
+          "semaine": "2027-01-04",
+          "prevision": 5,
+          "borne_basse": 1,
+          "borne_haute": 9
+        },
+        {
+          "semaine": "2027-01-11",
+          "prevision": 6,
+          "borne_basse": 2,
+          "borne_haute": 10
+        },
+        {
+          "semaine": "2027-01-18",
+          "prevision": 5,
+          "borne_basse": 2,
+          "borne_haute": 9
+        },
+        {
+          "semaine": "2027-01-25",
+          "prevision": 5,
+          "borne_basse": 1,
+          "borne_haute": 9
+        }
+      ]
+    }
+  }
+}
