@@ -38,7 +38,7 @@ services:
       - "8501:8501"
     depends_on:
       - api
-    command: streamlit run ui/app.py --server.address 0.0.0.0
+    command: streamlit run ui/app.py --server.address 0.0.0.0 --server.enableCORS=false --server.enableXsrfProtection=false
 
 volumes:
   pgdata:

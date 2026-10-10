@@ -121,3 +121,4 @@ def carte_kpi(label, valeur, sous_titre="", couleur="vert"):
         <div class="kpi-sub">{sous_titre}</div>
     </div>
     """, unsafe_allow_html=True)
+
