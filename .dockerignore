@@ -1,0 +1,12 @@
+.venv/
+.venv*/
+__pycache__/
+*.pyc
+.git/
+.vscode/
+data/brut/
+data/*.db
+notebooks/
+docs/
+*.log
+*.ipynb

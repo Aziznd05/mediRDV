@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: medirdv_db
+    environment:
+      POSTGRES_USER: medirdv
+      POSTGRES_PASSWORD: medirdv2026
+      POSTGRES_DB: medirdv
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medirdv"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: medirdv_api
+    environment:
+      DATABASE_URL: postgresql://medirdv:medirdv2026@postgres:5432/medirdv
+      SECRET_KEY: change-moi-en-production-vraiment-long
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+
+  ui:
+    build: .
+    container_name: medirdv_ui
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    command: streamlit run ui/app.py --server.address 0.0.0.0
+
+volumes:
+  pgdata:
