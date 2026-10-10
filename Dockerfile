@@ -14,6 +14,7 @@ COPY ui/ ./ui/
 COPY analytics/ ./analytics/
 COPY scripts/ ./scripts/
 COPY data/propre/ ./data/propre/
+COPY .streamlit/ ./.streamlit/
 
 EXPOSE 8000 8501
 

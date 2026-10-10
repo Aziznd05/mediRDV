@@ -60,13 +60,34 @@ def heatmap(db: Session = Depends(get_db)):
 
 @router.get("/evolution")
 def evolution(db: Session = Depends(get_db)):
-    """Évolution mensuelle (EF-22)."""
-    q = db.query(
-        func.strftime("%Y-%m", models.RendezVous.date_rdv).label("mois"),
-        func.count().label("total"),
-        func.sum(case((models.RendezVous.statut == "Absent", 1), else_=0)).label("absents"),
-    ).group_by("mois").order_by("mois").all()
-    return [{"mois": m, "total": t, "absents": a} for m, t, a in q]
+    """Évolution mensuelle (EF-22) — compatible SQLite et PostgreSQL."""
+    from sqlalchemy import text
+    from api.config import settings
+
+    # Détecte le type de base
+    is_postgres = settings.database_url.startswith("postgresql")
+
+    if is_postgres:
+        requete = text("""
+            SELECT to_char(date_rdv, 'YYYY-MM') AS mois,
+                   COUNT(*) AS total,
+                   SUM(CASE WHEN statut = 'Absent' THEN 1 ELSE 0 END) AS absents
+            FROM rendez_vous
+            GROUP BY mois
+            ORDER BY mois
+        """)
+    else:
+        requete = text("""
+            SELECT strftime('%Y-%m', date_rdv) AS mois,
+                   COUNT(*) AS total,
+                   SUM(CASE WHEN statut = 'Absent' THEN 1 ELSE 0 END) AS absents
+            FROM rendez_vous
+            GROUP BY mois
+            ORDER BY mois
+        """)
+
+    resultat = db.execute(requete).fetchall()
+    return [{"mois": r[0], "total": r[1], "absents": r[2]} for r in resultat]
 
 
 @router.get("/specialites")
