@@ -23,6 +23,22 @@ if "token" not in st.session_state:
     login.afficher()
     st.stop()
 
+
+# --- Matrice des permissions par rôle ---
+# Chaque rôle a accès à un sous-ensemble de pages
+PERMISSIONS = {
+    "admin":       ["Tableau de bord", "Planning", "Prise de RDV", "Patients"],
+    "responsable": ["Tableau de bord", "Planning", "Prise de RDV", "Patients"],
+    "agent":       ["Planning", "Prise de RDV", "Patients"],
+    "medecin":     ["Planning"],
+    "direction":   ["Tableau de bord"],
+}
+
+
+def pages_autorisees(role: str):
+    return PERMISSIONS.get(role, [])
+
+
 # --- Sidebar ---
 with st.sidebar:
     # Logo
@@ -54,9 +70,19 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
+    # Filtrer les pages selon le rôle
+    pages_disponibles = pages_autorisees(role)
+    if not pages_disponibles:
+        st.error("Aucune page accessible pour votre rôle.")
+        if st.button("Se déconnecter", use_container_width=True):
+            for k in ["token", "role", "username"]:
+                st.session_state.pop(k, None)
+            st.rerun()
+        st.stop()
+
     page = st.radio(
         "Navigation",
-        ["Tableau de bord", "Planning", "Prise de RDV", "Patients"],
+        pages_disponibles,
         label_visibility="collapsed",
     )
 
@@ -73,6 +99,7 @@ with st.sidebar:
         '</div>'.format(gc=COULEURS['gris']),
         unsafe_allow_html=True,
     )
+
 
 # --- Routage ---
 if page == "Tableau de bord":
